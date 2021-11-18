@@ -14,7 +14,7 @@
 
 1.  `git clone https://gitee.com/pasalai/DarkLink.git `
 2.  `cd DarkLink`
-3.  `python3 -m pip install -r requirements.txt`
+3.  `python -m pip install -r requirements.txt`
 4.  `python manage.py runserver 0.0.0.0:8000`
 5.  使用浏览器访问http://127.0.0.1:8000 , 用户名为`admin`，密码为`password`  
 
