@@ -55,7 +55,7 @@ class missionAdmin(admin.ModelAdmin):
     actions = ['custom_button']
 
     def custom_button(self, request, queryset):
-        requests.get('http://127.0.0.1:8000/start', verify=False)   # 这个地方要改
+        requests.post('http://127.0.0.1:8000/start', verify=False)   # 这个地方要改
         pass
 
     # 显示的文本，与django admin一致
