@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.forms import model_to_dict
+
 from .models import mission, linksData, domainTable
 import requests
 
@@ -55,8 +57,8 @@ class missionAdmin(admin.ModelAdmin):
     actions = ['custom_button']
 
     def custom_button(self, request, queryset):
-        requests.post('http://127.0.0.1:8000/start', verify=False)   # 这个地方要改
-        pass
+        for queryset_item in queryset:
+            requests.post('http://127.0.0.1:8000/start', verify=False, data=model_to_dict(queryset_item))
 
     # 显示的文本，与django admin一致
     custom_button.short_description = '开始扫描任务'
