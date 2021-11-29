@@ -8,7 +8,7 @@ from getlinksapp.models import linksData
 
 def getResCode(url):
     try:
-        response = requests.get(url, verify=False, timeout=3)
+        response = requests.get(url, verify=False)
         return response.status_code
     except:
         return 0
@@ -71,97 +71,98 @@ def getLinks(url, domain):
 
     # 请求网页内容
 
-    headers = {"User-Agent": "CERNET URL SAFE SCAN SYSTEM. JUST FOR SHANDONG EDU DOMAIN."}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.34"}
+
     try:
         res = requests.get(url, headers=headers, verify=False, timeout=3)  # 去掉SSL证书检查
+
+        # 1.正则匹配文章中的链接并做检查
+        pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
+        find_url_temp = re.findall(pattern, res.text.replace(' ', ''))
+
+        # 正则匹配还是有问题，清除连接中的特殊符号如逗号分号
+        find_url = []
+        for item in find_url_temp:
+            item = re.sub(r"<.*>", "", item)  # 去掉标签内容
+            item = item.replace("'", '').replace(";", "")
+            item = re.sub(r"<.*", "", item)
+            find_url.append(item)
+
+        for link in find_url:  # find_url 是个列表，可能为空，则直接跳过该段代码
+            if linksData.objects.filter(link__exact=link):
+                continue
+            else:
+                rescode = getResCode(link)  # 获取状态值
+                try:
+                    r = requests.get(link, headers=headers, verify=False)
+                    r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
+                except:
+                    continue
+                try:
+                    abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
+                    saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
+                except:
+                    saveData(domain, link, url, rescode, False, [])  # 保存数据
+            if str(domain) in link:
+                getLinks(link, domain=domain)  # 域内未收录链接创建任务继续迭代
+
+        # 2.排查<a>标签中的链接并作检查
+        soup = bs4.BeautifulSoup(res.text, "lxml")
+        for links in soup.findAll('a', attrs={'href': re.compile("/")}):
+            # 筛选<a>标签中带有http/https的链接信息（第一种）
+            link = links.get('href')
+            if 'http://' in link or 'https://' in link:
+                if linksData.objects.filter(link__exact=link):
+                    continue
+                else:
+                    rescode = getResCode(link)  # 获取状态值
+                    try:
+                        r = requests.get(link, headers=headers, verify=False)
+                        r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
+                    except:
+                        continue
+                    try:
+                        abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
+                        saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
+                    except:
+                        saveData(domain, link, url, rescode, False, [])  # 保存数据
+
+                # 若获取到的链接是域内链接，则作为母链接继续向下发现链接
+                if str(domain) in str(link):
+                    getLinks(link, domain=domain)
+                    print(link,'下探扫描完成！')
+
+            # 筛选<a>标签中不带有域名信息的链接
+            else:
+                if link[0] != '/':
+                    if '../' in link:
+                        link = link.replace('../', '')
+                    link = url_domain + '/' + link
+                else:
+                    link = url_domain + link
+
+                if linksData.objects.filter(link__exact=link):
+                    continue
+                else:
+                    rescode = getResCode(link)  # 获取状态值
+                    try:
+                        r = requests.get(link, headers=headers, verify=False)
+                        r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
+                    except:
+                        continue
+                    try:
+                        abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
+                        saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
+                    except:
+                        saveData(domain, link, url, rescode, False, [])  # 保存数据
+
+                # 域内链接，作为母链接继续向下发现链接
+                if str(domain) in link:
+                    getLinks(link, domain=domain)
+                    print(link, '下探扫描完成！')
     except:
         # 调用腾讯云函数异地检测，返回异地检测结果
         # return tencent_cloud_function(url) # 还没写，也没部署
 
-        print('[x]请求出错！仔细阅读使用说明！')
-        print('[x]请求出错！仔细阅读使用说明！')
-        print('[x]请求出错！仔细阅读使用说明！')
+        print('[x]', url, ' 请求出错！仔细阅读使用说明！')
         pass
-
-    # 1.正则匹配文章中的链接并做检查
-    pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
-    find_url_temp = re.findall(pattern, res.text.replace(' ', ''))
-
-    # 正则匹配还是有问题，清除连接中的特殊符号如逗号分号
-    find_url = []
-    for item in find_url_temp:
-        item = re.sub(r"<.*>", "", item)  # 去掉标签内容
-        item = item.replace("'", '').replace(";", "")
-        item = re.sub(r"<.*", "", item)
-        find_url.append(item)
-
-    for link in find_url:  # find_url 是个列表，可能为空，则直接跳过该段代码
-        if linksData.objects.filter(link__exact=link):
-            continue
-        else:
-            rescode = getResCode(link)  # 获取状态值
-            try:
-                r = requests.get(link, headers=headers, verify=False)
-                r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
-            except:
-                continue
-            try:
-                abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
-                saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
-            except:
-                saveData(domain, link, url, rescode, False, [])  # 保存数据
-        if str(domain) in link:
-            getLinks(link, domain=domain)  # 域内未收录链接创建任务继续迭代
-
-    # 2.排查<a>标签中的链接并作检查
-    soup = bs4.BeautifulSoup(res.text, "lxml")
-    for links in soup.findAll('a', attrs={'href': re.compile("/")}):
-        # 筛选<a>标签中带有http/https的链接信息（第一种）
-        link = links.get('href')
-        if 'http://' in link or 'https://' in link:
-            if linksData.objects.filter(link__exact=link):
-                continue
-            else:
-                rescode = getResCode(link)  # 获取状态值
-                try:
-                    r = requests.get(link, headers=headers, verify=False)
-                    r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
-                except:
-                    continue
-                try:
-                    abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
-                    saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
-                except:
-                    saveData(domain, link, url, rescode, False, [])  # 保存数据
-
-            # 若获取到的链接是域内链接，则作为母链接继续向下发现链接
-            if str(domain) in str(link):
-                getLinks(link, domain=domain)
-
-        # 筛选<a>标签中不带有域名信息的链接
-        else:
-            if link[0] != '/':
-                if '../' in link:
-                    link = link.replace('../', '')
-                link = url_domain + '/' + link
-            else:
-                link = url_domain + link
-
-            if linksData.objects.filter(link__exact=link):
-                continue
-            else:
-                rescode = getResCode(link)  # 获取状态值
-                try:
-                    r = requests.get(link, headers=headers, verify=False)
-                    r.encoding = r.apparent_encoding if r.encoding == 'ISO-8859-1' else r.encoding
-                except:
-                    continue
-                try:
-                    abnormal, abnormalPoint = checkMinganci(r.text)  # 检测敏感词
-                    saveData(domain, link, url, rescode, abnormal, abnormalPoint)  # 保存数据
-                except:
-                    saveData(domain, link, url, rescode, False, [])  # 保存数据
-
-            # 域内链接，作为母链接继续向下发现链接
-            if str(domain) in link:
-                getLinks(link, domain=domain)

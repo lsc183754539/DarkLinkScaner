@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'simpleui',
+    'import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -121,6 +122,17 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SIMPLEUI_HOME_INFO = False  # 关闭组件版本信息
-SIMPLEUI_LOGO = 'https://www.cernet.com/static/cernet/img/logo.png'
+# SIMPLEUI_LOGO = 'https://www.cernet.com/static/cernet/img/logo.png'
 SIMPLEUI_ANALYSIS = False   # 关闭日志上传分析
 SIMPLEUI_STATIC_OFFLINE = True  # 启用离线模式，适用于内网
+import time
+SIMPLEUI_CONFIG = {
+    'system_keep': True,
+    # 'menu_display': ['Simpleui', '测试', '权限认证', '动态菜单测试'],      # 开启排序和过滤功能, 不填此字段为默认排序和全部显示, 空列表[] 为全部不显示.
+    'dynamic': True,    # 设置是否开启动态菜单, 默认为False. 如果开启, 则会在每次用户登陆时动态展示菜单内容
+    'menus': [{
+        'name': '关于系统',
+        'icon': 'fas fa-code',
+        'url': './about/about.html'
+    }]
+}

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from getlinksapp.models import linksData
 import getlinksapp.models
 import requests
@@ -27,4 +27,7 @@ def start_scan(request):
         t.setDaemon(False)
         t.start()
         print('[√] ', str(mission_domain) + ' had run!\n')
-    return HttpResponse(content='<script>alert("任务运行成功！")</script>', status='200')
+    return JsonResponse(data={
+        'status': 'success',
+        'msg': '任务开始成功！'
+    })
