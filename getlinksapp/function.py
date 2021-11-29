@@ -41,22 +41,22 @@ def saveData(domain, link, fromUrl, resCode, abnormal, abnormalPoint):
     link_object.find_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     link_object.save()
 
-
+# 打算重写代码，再说再说
 # 1.正则匹配文章中的链接并做检查
-def getLinks_by_re(res):
-    pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
-    find_url_temp = re.findall(pattern, res.text.replace(' ', ''))
-
-    # 正则匹配还是有问题，清除连接中的特殊符号如逗号分号
-    find_url = []
-    for item in find_url_temp:
-        item = re.sub(r"<.*>", "", item)  # 去掉标签内容
-        item = item.replace("'", '').replace(";", "")
-        item = re.sub(r"<.*", "", item)
-        find_url.append(item)
-
-    return find_url
-    pass
+# def getLinks_by_re(res):
+#     pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
+#     find_url_temp = re.findall(pattern, res.text.replace(' ', ''))
+#
+#     # 正则匹配还是有问题，清除连接中的特殊符号如逗号分号
+#     find_url = []
+#     for item in find_url_temp:
+#         item = re.sub(r"<.*>", "", item)  # 去掉标签内容
+#         item = item.replace("'", '').replace(";", "")
+#         item = re.sub(r"<.*", "", item)
+#         find_url.append(item)
+#
+#     return find_url
+#     pass
 
 
 def getLinks(url, domain):
