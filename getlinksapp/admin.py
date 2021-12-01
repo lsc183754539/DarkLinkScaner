@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from simpleui.admin import AjaxAdmin
 import threading
 import getlinksapp.function as function
@@ -67,18 +67,20 @@ class missionAdmin(AjaxAdmin):
             t.setDaemon(False)
             t.start()
             print('[√] ', str(mission_domain) + ' had run!\n')
-        return JsonResponse(data={'status': 'success', 'msg': '任务开始成功！'},status=200)
+        return HttpResponse(status=302, headers={'location': '/getlinksapp/linksdata/'})
 
     layer_input.short_description = '开始扫描选中任务'
     layer_input.type = 'primary'
     layer_input.icon = 'el-icon-s-promotion'
     # 指定为弹出层，这个参数最关键
-    layer_input.layer = {
-        # 弹出层中的输入框配置
-        'title': '任务提示',
-        'tips': '任务已经开始，结果请在链接库中查看！',
-        'confirm_button': '明白',
-        'width': '50%'}
+    # layer_input.layer = {
+    #     # 弹出层中的输入框配置
+    #     'title': '任务提示',
+    #     'tips': '任务已经开始，结果请在链接库中查看！',
+    #     'confirm_button': '明白',
+    #     'width': '50%',
+    # }
+    layer_input.confirm = '任务开始成功,或点击取消结束任务！'
 
 
 admin.site.register(mission, missionAdmin)
