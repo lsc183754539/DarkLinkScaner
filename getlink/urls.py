@@ -18,7 +18,5 @@ from django.urls import path
 from getlinksapp import views
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
-    path('start', views.start_scan),
     path('', admin.site.urls),
 ]
