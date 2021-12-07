@@ -1,6 +1,6 @@
 requests==2.20.0
 Django==3.2.8
-django-simpleui==2021.1.1
+django-simpleui==2021.12.7
 simpleui==4.0.2
 lxml
 bs4
