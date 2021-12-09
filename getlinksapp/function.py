@@ -1,8 +1,12 @@
+import time
+
 import bs4
 import re
 import requests
+import xlrd
+from getlink.settings import MEDIA_ROOT,STATIC_URL
 from datetime import datetime
-from getlinksapp.models import linksData
+from getlinksapp.models import linksData,domainTable,mission
 
 # 引入定义敏感词
 with open('./getlinksapp/rules.txt', 'r', encoding='utf-8') as rd:
@@ -133,3 +137,27 @@ def getLinks(url, domain):
     # 2.排查<a>标签中的链接并作检查
     find_url = getLinks_by_soup(res_content, url)
     HandleandSave(find_url, domain, url)
+
+
+class ExcelImport:
+    def __init__(self, file_name):
+        # self.file_name = unicode(file_name, "utf-8")
+        # 文件路径修改
+        self.file_name = (MEDIA_ROOT + str(file_name)).replace("/", "\\")
+        print (self.file_name)
+        self.workbook = xlrd.open_workbook(self.file_name)
+        self.table = self.workbook.sheets()[0]
+        # 获取总行数
+        self.nrows = self.table.nrows
+
+    def get_cases(self):
+        # 从第二行开始
+        for x in range(1, self.nrows):
+            row = self.table.row_values(x)
+            domain_item = domainTable()
+            domain_item.id = row[0]
+            domain_item.domain = row[2]
+            domain_item.save()
+            obj = domainTable.objects.get(id=row[0])
+            mission.objects.create(domain=obj, num=row[0],url=row[1])
+        return 1

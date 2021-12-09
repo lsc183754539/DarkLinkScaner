@@ -21,7 +21,7 @@ class linksData(models.Model):
 
     class Meta:
         verbose_name = "链接信息"
-        verbose_name_plural = "链接库"
+        verbose_name_plural = "扫描结果"
 
 
 class mission(models.Model):
@@ -47,3 +47,17 @@ class domainTable(models.Model):
     class Meta:
         verbose_name = "域信息"
         verbose_name_plural = "域库"
+
+# 用例文件
+class CaseFile(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name="编号")
+    file_name = models.FileField(upload_to='xlsfile/%Y/%m/%d/', verbose_name=u"文件名称")
+
+    # 不注释会报错
+    # def __str__(self):
+    #     return self.file_name
+
+    # 定义表名称
+    class Meta:
+        verbose_name = "文件管理"
+        verbose_name_plural = "文件管理"

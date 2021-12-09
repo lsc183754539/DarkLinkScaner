@@ -5,3 +5,4 @@ simpleui==4.0.2
 lxml
 bs4
 django-import-export
+xlrd==1.2.0

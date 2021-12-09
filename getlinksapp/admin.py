@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from simpleui.admin import AjaxAdmin
 import threading
 import getlinksapp.function as function
-from .models import mission, linksData, domainTable
+from .models import mission, linksData, domainTable, CaseFile
 
 # Register your models here.
 admin.site.site_title = '暗链扫描系统'
@@ -54,7 +54,7 @@ class missionAdmin(AjaxAdmin):
     list_per_page = 50
 
     # 增加自定义按钮
-    actions = ('layer_input',)
+    actions = ('layer_input','upload_file',)
 
     def layer_input(self, request, queryset):
         # 接收到的queryset即为选中的数据的model数据组成的列表
@@ -72,15 +72,40 @@ class missionAdmin(AjaxAdmin):
     layer_input.short_description = '开始扫描选中任务'
     layer_input.type = 'primary'
     layer_input.icon = 'el-icon-s-promotion'
-    # 指定为弹出层，这个参数最关键
-    # layer_input.layer = {
-    #     # 弹出层中的输入框配置
-    #     'title': '任务提示',
-    #     'tips': '任务已经开始，结果请在链接库中查看！',
-    #     'confirm_button': '明白',
-    #     'width': '50%',
-    # }
     layer_input.confirm = '任务开始成功,或点击取消结束任务！'
+
+
+
+    def upload_file(self, request, queryset):
+        # 这里的upload 就是和params中配置的key一样
+        upload = request.FILES['upload']
+        print('接收到上传的文件',upload.name)
+        file = CaseFile()
+        file.file_name=upload
+        file.save()
+        # 开始导入文件
+        imp = function.ExcelImport(file_name=file.file_name)
+        recode = imp.get_cases()
+        if recode == 1:
+            return JsonResponse(data={
+                'status': 'success',
+                'msg': '处理成功！'
+            })
+
+
+
+    upload_file.short_description = '批量导入'
+    upload_file.type = 'success'
+    upload_file.icon = 'el-icon-upload'
+    upload_file.enable = True
+
+    upload_file.layer = {
+        'params': [{
+            'type': 'file',
+            'key': 'upload',
+            'label': 'xlsx文件'
+        }]
+    }
 
 
 admin.site.register(mission, missionAdmin)
