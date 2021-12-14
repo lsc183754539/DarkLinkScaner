@@ -141,3 +141,4 @@ SIMPLEUI_CONFIG = {
     }]
 }
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400 # higher than the count of fields
