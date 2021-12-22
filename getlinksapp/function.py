@@ -4,9 +4,9 @@ import bs4
 import re
 import requests
 import xlrd
-from getlink.settings import MEDIA_ROOT,STATIC_URL
+from getlink.settings import MEDIA_ROOT, STATIC_URL
 from datetime import datetime
-from getlinksapp.models import linksData,domainTable,mission
+from getlinksapp.models import linksData, domainTable, mission
 
 # 引入定义敏感词
 with open('./getlinksapp/rules.txt', 'r', encoding='utf-8') as rd:
@@ -92,6 +92,8 @@ def getLinks_by_soup(res, url):
         if url_domain in link or 'http://' in link or 'https://' in link:
             find_url.append(link)
         else:
+            if len(link) == 0:
+                continue
             if link[0] != '/':
                 if '../' in link:
                     link = link.replace('../', '')
@@ -144,7 +146,7 @@ class ExcelImport:
         # self.file_name = unicode(file_name, "utf-8")
         # 文件路径修改
         self.file_name = (MEDIA_ROOT + str(file_name)).replace("/", "\\")
-        print (self.file_name)
+        print(self.file_name)
         self.workbook = xlrd.open_workbook(self.file_name)
         self.table = self.workbook.sheets()[0]
         # 获取总行数
@@ -159,5 +161,5 @@ class ExcelImport:
             domain_item.domain = row[2]
             domain_item.save()
             obj = domainTable.objects.get(id=row[0])
-            mission.objects.create(domain=obj, num=row[0],url=row[1])
+            mission.objects.create(domain=obj, num=row[0], url=row[1])
         return 1
