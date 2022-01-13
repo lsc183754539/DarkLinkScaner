@@ -1,3 +1,31 @@
-<h1>About us</h1>
 
-<h1>导入模板下载：<a href="/static/import.xlsx">下载连接</a></h1>
+<h1>注意事项</h1>
+<h3>扫描任务导入模板文件下载：<a href="/static/import.xlsx">import.xlsx</a></h3>
+
+<h1>关于系统</h1>
+
+<h4>介绍</h4>
+
+<p>{<strong>DarkLink</strong>
+针对域的暗链接扫描系统，可以对网站进行多级页面的抓取分析，发现失效链接及敏感内容链接。}
+<img alt="系统截图" title="微信图片_20211117111926.png" src="https://images.gitee.com/uploads/images/2021/1117/111941_a326bd9d_1668500.png"/></p>
+
+<h4>软件架构</h4>
+
+<p>基于Python3 及 Django3框架 开发的网站暗链接检测系统。</p>
+
+<h4>安装教程</h4>
+
+<ol><li><code>git clone https://gitee.com/pasalai/DarkLink.git </code></li><li><code>cd DarkLink</code></li><li><code>python -m pip install -r requirements.txt</code></li><li><code>python manage.py runserver 0.0.0.0:8000</code></li><li>使用浏览器访问http://127.0.0.1:8000 , 用户名为<code>admin</code>，密码为<code>password</code>  </li></ol>
+
+<h4>使用说明</h4>
+
+<ol><li>扫描针对的是<strong>域</strong>，请先在域列表中添加域信息，如：<code>sdu.edu.cn</code>(==*.sdu.edu.cn + sdu.edu.cn)或<code>jwc.sdu.edu.cn</code> (==*.jwc.sdu.edu.cn + jwc.sdu.edu.cn)</li><li>任务列表中的链接地址仅作为抓取的起点链接，建议填写主页，对未出现的信息孤岛链接建议另行添加域及任务</li><li>若运行过程中提示<code>远程主机断开连接</code>等错误导致程序终止，请更换网络环境</li><li><strong>若使用过程中出现任何问题或疑惑，请提交Issues,注明报错信息！</strong></li><li><strong>若使用过程中出现任何问题或疑惑，请提交Issues,注明报错信息！</strong></li><li><strong>若使用过程中出现任何问题或疑惑，请提交Issues,注明报错信息！</strong></li></ol>
+
+<h4>参与贡献</h4>
+
+<ol><li>Fork 本仓库</li><li>新建 Feat_DarkLink 分支</li><li>提交代码</li><li>新建 Pull Request</li></ol>
+
+<h4>贡献者</h4>
+
+<ol><li><a href="https://gitee.com/Grergo">OdinMX</a></li></ol>

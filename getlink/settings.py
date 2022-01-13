@@ -81,6 +81,24 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306',
+#         'NAME': 'darklink',
+#         'USER': 'root',
+#         'PASSWORD': '123456',
+#         'OPTIONS': {
+#             'init_command': ("SET default_storage_engine=INNODB,"
+#                              "sql_mode='STRICT_TRANS_TABLES',"
+#                              "GLOBAL max_connections = 100000"),
+#             'charset': 'utf8mb4',
+#         },
+#         'AUTOCOMMIT': True,
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -116,9 +134,9 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 # 文件上传配置
-MEDIA_ROOT = os.path.join(STATIC_URL, '/static/upload/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/upload/')
 # MEDIA_URL = '/upload/'
 
 # Default primary key field type
@@ -127,13 +145,14 @@ MEDIA_ROOT = os.path.join(STATIC_URL, '/static/upload/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SIMPLEUI_HOME_INFO = False  # 关闭组件版本信息
 # SIMPLEUI_LOGO = 'https://www.cernet.com/static/cernet/img/logo.png'
-SIMPLEUI_ANALYSIS = False   # 关闭日志上传分析
+SIMPLEUI_ANALYSIS = False  # 关闭日志上传分析
 SIMPLEUI_STATIC_OFFLINE = True  # 启用离线模式，适用于内网
 import time
+
 SIMPLEUI_CONFIG = {
     'system_keep': True,
     # 'menu_display': ['Simpleui', '测试', '权限认证', '动态菜单测试'],      # 开启排序和过滤功能, 不填此字段为默认排序和全部显示, 空列表[] 为全部不显示.
-    'dynamic': True,    # 设置是否开启动态菜单, 默认为False. 如果开启, 则会在每次用户登陆时动态展示菜单内容
+    'dynamic': True,  # 设置是否开启动态菜单, 默认为False. 如果开启, 则会在每次用户登陆时动态展示菜单内容
     'menus': [{
         'name': '关于系统',
         'icon': 'fas fa-code',
@@ -141,4 +160,4 @@ SIMPLEUI_CONFIG = {
     }]
 }
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400 # higher than the count of fields
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 102400  # higher than the count of fields
