@@ -19,7 +19,7 @@ linksDatas = linksData.objects.all()
 linksDatas = list(linksDatas)
 links_list = []
 for item in linksDatas:
-    links_list.append(item.link)
+    links_list.append([item.link, item.from_link])
 linksDatas = []  # 释放内容，减少内存占用
 
 # 引入定义敏感词
@@ -60,7 +60,7 @@ def saveData(domain, link, fromUrl, resCode, abnormal, abnormalPoint):
     link_object.link = link
 
     # 链接加入列表
-    links_list.append(link)
+    links_list.append([link, fromUrl])
 
     link_object.response_code = resCode
     link_object.from_link = fromUrl
@@ -126,8 +126,9 @@ def getLinks_by_soup(res, url):
 
 def HandleandSave(find_url, domain, url):
     for link in find_url:  # find_url 是个列表，可能为空，则直接跳过该段代码
-        if link in links_list:
-            print('[⚙]', link, '已经存在')
+        # 改改改，重复发现不保存
+        if [link, url] in links_list:
+            print('[⚙]', url, '页面扫描过了，该页面的', link, '已经存在.')
             continue
         else:
             res_code, res_content_2 = getRes(link)  # 获取状态值
