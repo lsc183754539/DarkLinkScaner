@@ -54,7 +54,8 @@ def getRes(url):
         return 0, None
 
 
-def saveData(domain, link, fromUrl, resCode, abnormal, abnormalPoint):
+# def saveData(domain, link, fromUrl, resCode, abnormal, abnormalPoint):
+def saveData(domain, link, fromUrl, resCode, abnormalPoint):
     link_object = linksData()
     link_object.mission = domain
     link_object.link = link
@@ -64,7 +65,7 @@ def saveData(domain, link, fromUrl, resCode, abnormal, abnormalPoint):
 
     link_object.response_code = resCode
     link_object.from_link = fromUrl
-    link_object.abnormal = abnormal
+    # link_object.abnormal = abnormal
     link_object.abnormal_point = abnormalPoint
     link_object.find_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     link_object.save()
