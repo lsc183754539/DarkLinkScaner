@@ -149,21 +149,30 @@ def HandleandSave(find_url, domain, url):
                 getLinks(link, domain=domain)  # 域内未收录链接创建任务继续迭代
                 print(link, '下探扫描完成！')
 
-
+def VerifyUrl(url)->bool:
+    black_list=r"\.mov|\.mkv|\.avi|\.mp4|\.mp3|\.f4v|\.asf|\.wmv|\.mpeg|\.exe|\.doc|\.docx|\.pdf|\.xlsx|\.xls|\.ppt|\.pptx|\.run|\.rpm|\.deb|\.msi|\.iso|\.zip|\.7z|\.rar|\.tar|\.tar.gz|\.png|\.jpeg|\.jpg|\.svg|\.gif|\.ttf|\.otf|\.woff|\.dtd"
+    pattern = re.compile(black_list)
+    find_temp = re.findall(pattern, url)
+    print(find_temp)
+    if len(find_temp)>0:
+        return False
+    else:
+        return True
 def getLinks(url, domain):
     # 获取链接的内容
-    print('[...]正在获取', url, '的网页内容')
-    res_code, res_content = getRes(url)
-    if res_code != 0 and res_content != None:
-        # 1.正则匹配文章中的链接并做检查
-        find_url = getLinks_by_re(res_content)
-        HandleandSave(find_url, domain, url)
+    if VerifyUrl(url):
+        print('[...]正在获取', url, '的网页内容')
+        res_code, res_content = getRes(url)
+        if res_code != 0 and res_content != None:
+            # 1.正则匹配文章中的链接并做检查
+            find_url = getLinks_by_re(res_content)
+            HandleandSave(find_url, domain, url)
 
-        # 2.排查<a>标签中的链接并作检查
-        find_url = getLinks_by_soup(res_content, url)
-        HandleandSave(find_url, domain, url)
-    else:
-        HandleandSave('', domain, url)
+            # 2.排查<a>标签中的链接并作检查
+            find_url = getLinks_by_soup(res_content, url)
+            HandleandSave(find_url, domain, url)
+        else:
+            HandleandSave('', domain, url)
 
 
 class ExcelImport:
