@@ -141,23 +141,28 @@ def HandleandSave(find_url, domain, url):
                         print(abnormalPoint[i], end='、')
                 else:
                     print('[√]', link, '无异常')
-                saveData(domain, link, url, res_code, abnormal, abnormalPoint)  # 保存数据
+                # saveData(domain, link, url, res_code, abnormal, abnormalPoint)  # 保存数据
+                saveData(domain, link, url, res_code, abnormalPoint)  # 保存数据
             except:
-                saveData(domain, link, url, res_code, False, None)  # 保存数据
+                # saveData(domain, link, url, res_code, False, None)  # 保存数据
+                saveData(domain, link, url, res_code, None)  # 保存数据
                 print('[x]', link, '请求数据或处理异常')
             if str(domain) in link:
                 getLinks(link, domain=domain)  # 域内未收录链接创建任务继续迭代
                 print(link, '下探扫描完成！')
 
-def VerifyUrl(url)->bool:
-    black_list=r"\.mov|\.mkv|\.avi|\.mp4|\.mp3|\.f4v|\.asf|\.wmv|\.mpeg|\.exe|\.doc|\.docx|\.pdf|\.xlsx|\.xls|\.ppt|\.pptx|\.run|\.rpm|\.deb|\.msi|\.iso|\.zip|\.7z|\.rar|\.tar|\.tar.gz|\.png|\.jpeg|\.jpg|\.svg|\.gif|\.ttf|\.otf|\.woff|\.dtd"
+
+def VerifyUrl(url) -> bool:
+    black_list = r"\.mov|\.mkv|\.avi|\.mp4|\.mp3|\.f4v|\.asf|\.wmv|\.mpeg|\.exe|\.doc|\.docx|\.pdf|\.xlsx|\.xls|\.ppt|\.pptx|\.run|\.rpm|\.deb|\.msi|\.iso|\.zip|\.7z|\.rar|\.tar|\.tar.gz|\.png|\.jpeg|\.jpg|\.svg|\.gif|\.ttf|\.otf|\.woff|\.dtd"
     pattern = re.compile(black_list)
     find_temp = re.findall(pattern, url)
     print(find_temp)
-    if len(find_temp)>0:
+    if len(find_temp) > 0:
         return False
     else:
         return True
+
+
 def getLinks(url, domain):
     # 获取链接的内容
     if VerifyUrl(url):
@@ -178,8 +183,12 @@ def getLinks(url, domain):
 class ExcelImport:
     def __init__(self, file_name):
         # self.file_name = unicode(file_name, "utf-8")
-        # 文件路径修改
-        self.file_name = (MEDIA_ROOT + str(file_name)).replace("/", "\\")
+        # 判断操作系统，根据操作系统进行文件路径修改
+        import platform
+        if platform.system() == 'Windows':
+            self.file_name = (MEDIA_ROOT + str(file_name)).replace("/", "\\")
+        else:
+            self.file_name = (MEDIA_ROOT + str(file_name))#.replace("/", "\\")
         print(self.file_name)
         self.workbook = xlrd.open_workbook(self.file_name)
         self.table = self.workbook.sheets()[0]
@@ -187,13 +196,17 @@ class ExcelImport:
         self.nrows = self.table.nrows
 
     def get_cases(self):
-        # 从第二行开始
-        for x in range(1, self.nrows):
-            row = self.table.row_values(x)
-            domain_item = domainTable()
-            domain_item.id = row[0]
-            domain_item.domain = row[2]
-            domain_item.save()
-            obj = domainTable.objects.get(id=row[0])
-            mission.objects.create(domain=obj, num=row[0], url=row[1])
-        return 1
+        try:
+            # 从第二行开始
+            for x in range(1, self.nrows):
+                row = self.table.row_values(x)
+                domain_item = domainTable()
+                domain_item.id = row[0]
+                domain_item.domain = row[2]
+                domain_item.save()
+                obj = domainTable.objects.get(id=row[0])
+                mission.objects.create(domain=obj, num=row[0], url=row[1])
+            return 1
+        except Exception as err:
+            print(err)
+            return err
