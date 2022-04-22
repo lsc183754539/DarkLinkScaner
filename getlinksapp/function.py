@@ -73,10 +73,12 @@ def saveData(domain, link, fromUrl, resCode, abnormalPoint):
 
 # 1.正则匹配文章中的链接并做检查  此处正则表达式还需要更改
 def getLinks_by_re(res):
+    soup=bs4.BeautifulSoup(res.content,'lxml')
+    for script in soup(["script", "style", "link"]): 
+        script.extract()
     pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')  # 匹配模式
     # pattern = re.compile(r'(http(s)?://)?(www.)?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:d+)*(/w+.w+)*([?&]w+=w*)*$')  # 匹配模式
-    find_url_temp = re.findall(pattern, res.text.replace(' ', ''))
-
+    find_url_temp = re.findall(pattern, str(soup.contents))
     # 正则匹配还是有问题，清除连接中的特殊符号如逗号分号
     find_url = []
     for item in find_url_temp:
@@ -152,9 +154,8 @@ def HandleandSave(find_url, domain, url):
                 getLinks(link, domain=domain)  # 域内未收录链接创建任务继续迭代
                 print(link, '下探扫描完成！')
 
-
-def VerifyUrl(url) -> bool:
-    black_list = r"\.mov|\.mkv|\.avi|\.mp4|\.mp3|\.f4v|\.asf|\.wmv|\.mpeg|\.exe|\.doc|\.docx|\.pdf|\.xlsx|\.xls|\.ppt|\.pptx|\.run|\.rpm|\.deb|\.msi|\.iso|\.zip|\.7z|\.rar|\.tar|\.tar.gz|\.png|\.jpeg|\.jpg|\.svg|\.gif|\.ttf|\.otf|\.woff|\.dtd"
+def VerifyUrl(url)->bool:
+    black_list=r"\.mov|\.mkv|\.avi|\.mp4|\.mp3|\.f4v|\.asf|\.wmv|\.mpeg|\.exe|\.doc|\.docx|\.pdf|\.xlsx|\.xls|\.ppt|\.pptx|\.run|\.rpm|\.deb|\.msi|\.iso|\.zip|\.7z|\.rar|\.tar|\.tar.gz|\.png|\.jpeg|\.jpg|\.svg|\.gif|\.ttf|\.otf|\.woff|\.dtd|\.js(\?|\")|\.css"
     pattern = re.compile(black_list)
     find_temp = re.findall(pattern, url)
     print(find_temp)
