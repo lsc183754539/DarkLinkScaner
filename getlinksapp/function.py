@@ -43,7 +43,7 @@ def checkMinganci(response_text):
 def getRes(url):
     try:
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.34"}
+            "User-Agent": "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)"}
         response = requests.get(url, headers=headers, allow_redirects=True, verify=False)
         try:  # 判断编码，没有问题就跳过，有问题就改
             response.encoding = response.apparent_encoding if response.encoding == 'ISO-8859-1' else response.encoding
@@ -129,7 +129,7 @@ def getLinks_by_soup(res, url):
 
 def HandleandSave(find_url, domain, url):
     for link in find_url:  # find_url 是个列表，可能为空，则直接跳过该段代码
-        # 改改改，重复发现不保存
+        # 改改改，同一网址会扫描多次，效率太低
         if [link, url] in links_list:
             print('[⚙]', url, '页面扫描过了，该页面的', link, '已经存在.')
             continue
@@ -185,12 +185,12 @@ def getLinks(url, domain):
 class ExcelImport:
     def __init__(self, file_name):
         # self.file_name = unicode(file_name, "utf-8")
-        # 判断操作系统，根据操作系统进行文件路径修改
+        # 判断操作系统，根据操作系统进行文件路径格式修改
         import platform
         if platform.system() == 'Windows':
             self.file_name = (MEDIA_ROOT + str(file_name)).replace("/", "\\")
         else:
-            self.file_name = (MEDIA_ROOT + str(file_name))#.replace("/", "\\")
+            self.file_name = (MEDIA_ROOT + str(file_name))
         print(self.file_name)
         self.workbook = xlrd.open_workbook(self.file_name)
         self.table = self.workbook.sheets()[0]
